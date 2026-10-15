@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Schedules | AeroMaintain</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+        
+<div class="schedule-header">
+    <div>
+        <h1>Maintenance Schedule Management</h1>
+        <p>Manage aircraft maintenance plans and schedules.</p>
+    </div>
+
+    <a class="back-dashboard" href="{{ url_for('dashboard') }}">
+        ← Back to Dashboard
+    </a>
+</div>
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endwith %}
+
+        <h2>Add New Schedule</h2>
+
+        <form method="POST" action="{{ url_for('add_schedule') }}">
+            <label>Aircraft</label>
+            <select name="tail_number" required>
+                {% for aircraft in aircraft_list %}
+                    <option value="{{ aircraft[0] }}">{{ aircraft[0] }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Scheduled Date</label>
+            <input type="date" name="scheduled_date" required>
+
+            <label>Maintenance Type</label>
+            <select name="maintenance_type" required>
+                <option value="A-Check">A-Check</option>
+                <option value="B-Check">B-Check</option>
+                <option value="C-Check">C-Check</option>
+                <option value="D-Check">D-Check</option>
+            </select>
+
+            <label>Technician</label>
+            <select name="technician_id" required>
+                {% for technician in technicians %}
+                    <option value="{{ technician[0] }}">
+                        {{ technician[1] }} - {{ technician[2] }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Add Schedule</button>
+        </form>
+
+        <h2>Existing Schedules</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Aircraft</th>
+                    <th>Date</th>
+                    <th>Maintenance</th>
+                    <th>Technician</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for schedule in schedules %}
+                <tr>
+                    <td>{{ schedule[0] }}</td>
+                    <td>{{ schedule[1] }}</td>
+                    <td>{{ schedule[2].strftime('%d-%m-%Y') }}</td>
+                    <td>{{ schedule[3] }}</td>
+                    <td>{{ schedule[5] }}</td>
+                    <td>{{ schedule[4] }}</td>
+                    <td>
+                        <form method="POST"
+                              action="{{ url_for('update_schedule_status', schedule_id=schedule[0]) }}">
+                            <select name="status" required>
+                                <option value="Scheduled"
+                                    {% if schedule[4] == 'Scheduled' %}selected{% endif %}>
+                                    Scheduled
+                                </option>
+                                <option value="In Progress"
+                                    {% if schedule[4] == 'In Progress' %}selected{% endif %}>
+                                    In Progress
+                                </option>
+                                <option value="Completed"
+                                    {% if schedule[4] == 'Completed' %}selected{% endif %}>
+                                    Completed
+                                </option>
+                            </select>
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No maintenance schedules found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

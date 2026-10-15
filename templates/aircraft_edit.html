@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Aircraft | AeroMaintain</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main style="padding: 35px;">
+        <h1>Edit Aircraft</h1>
+        <p>Update the details for {{ aircraft[0] }}.</p>
+
+        <p><a href="{{ url_for('aircraft_management') }}">
+            ← Back to Aircraft Management
+        </a></p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <p class="flash-message {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endwith %}
+
+        <section style="background: white; padding: 24px;
+                        border-radius: 12px; max-width: 600px;">
+            <form method="POST">
+                <p>
+                    <label for="tail_number">Tail Number</label><br>
+                    <input id="tail_number" type="text"
+                           value="{{ aircraft[0] }}" readonly>
+                </p>
+
+                <p>
+                    <label for="aircraft_model">Aircraft Model</label><br>
+                    <input id="aircraft_model" name="aircraft_model"
+                           type="text" maxlength="100"
+                           value="{{ aircraft[1] }}" required>
+                </p>
+
+                <p>
+                    <label for="flight_hours">Flight Hours</label><br>
+                    <input id="flight_hours" name="flight_hours"
+                           type="number" min="0" step="any"
+                           value="{{ aircraft[2] }}" required>
+                </p>
+
+                <p>
+                    <label for="maintenance_type">Maintenance Type</label><br>
+                    <select id="maintenance_type" name="maintenance_type" required>
+                        {% for item in ["A-Check", "B-Check", "C-Check", "D-Check"] %}
+                            <option value="{{ item }}"
+                                {% if aircraft[3] == item %}selected{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor %}
+                        {% if aircraft[3] and aircraft[3] not in
+                            ["A-Check", "B-Check", "C-Check", "D-Check"] %}
+                            <option value="{{ aircraft[3] }}" selected>
+                                {{ aircraft[3] }}
+                            </option>
+                        {% endif %}
+                    </select>
+                </p>
+
+                <p>
+                    <label for="facility_id">Hangar Facility</label><br>
+                    <select id="facility_id" name="facility_id" required>
+                        {% for facility in facilities %}
+                            <option value="{{ facility[0] }}"
+                                {% if aircraft[4] == facility[0] %}selected{% endif %}>
+                                {{ facility[1] }} (ID: {{ facility[0] }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </p>
+
+                <button type="submit">Save Changes</button>
+                <a href="{{ url_for('aircraft_management') }}">
+                    Cancel
+                </a>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
